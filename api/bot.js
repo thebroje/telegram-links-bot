@@ -104,9 +104,9 @@ bot.on('text', async (ctx) => {
   }
 });
 
-bot.launch();
+// Configurar el webhook
+bot.telegram.setWebhook(`https://telegram-links-bot.vercel.app/api/bot`);
 
-// Exportar una función para manejar las solicitudes de Vercel
 module.exports = (req, res) => {
-  res.status(200).send('Bot is running');
+  bot.handleUpdate(req.body, res);
 };
