@@ -1,11 +1,10 @@
 const { Telegraf } = require('telegraf');
-const { botToken } = require('../src/config');
-const { addLink, isLinkRegistered, addUserWarning, removeLink } = require('../src/database');
-const { extractUrls } = require('../src/helpers');
+const { botToken } = require('./config');
+const { addLink, isLinkRegistered, addUserWarning, removeLink } = require('./database');
+const { extractUrls } = require('./helpers');
 
 const bot = new Telegraf(botToken);
 
-// Mensaje de ayuda
 const helpMessage = `
 Commands:
 /addLink - Adds a link to the list of allowed links. Only administrators can use this command.
@@ -13,7 +12,6 @@ Commands:
 /help - Show a list of commands.
 `;
 
-// Función para verificar si un usuario es administrador
 async function isAdmin(ctx, userId) {
   try {
     const member = await ctx.getChatMember(userId);
@@ -32,7 +30,6 @@ bot.command('help', (ctx) => {
   ctx.reply(helpMessage);
 });
 
-// Comando para agregar enlaces
 bot.command('addLink', async (ctx) => {
   const isUserAdmin = await isAdmin(ctx, ctx.message.from.id);
   if (!isUserAdmin) {
@@ -53,7 +50,6 @@ bot.command('addLink', async (ctx) => {
   }
 });
 
-// Comando para eliminar enlaces
 bot.command('removeLink', async (ctx) => {
   const isUserAdmin = await isAdmin(ctx, ctx.message.from.id);
   if (!isUserAdmin) {
@@ -78,7 +74,6 @@ bot.command('removeLink', async (ctx) => {
   }
 });
 
-// Manejo de mensajes para verificar enlaces no autorizados
 bot.on('text', async (ctx) => {
   const userId = ctx.from.id;
   const urls = extractUrls(ctx.message.text);
@@ -104,9 +99,16 @@ bot.on('text', async (ctx) => {
   }
 });
 
-// Configurar el webhook
-bot.telegram.setWebhook(`https://telegram-links-bot.vercel.app/api/bot`);
-
-module.exports = (req, res) => {
-  bot.handleUpdate(req.body, res);
+module.exports = async (req, res) => {
+  if (req.method === 'POST') {
+    try {
+      await bot.handleUpdate(req.body);
+      res.status(200).send('OK');
+    } catch (error) {
+      console.error('Error handling update:', error);
+      res.status(500).send('Internal Server Error');
+    }
+  } else {
+    res.status(405).send('Method Not Allowed');
+  }
 };
