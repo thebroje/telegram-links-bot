@@ -1,6 +1,6 @@
 const { MongoClient } = require('mongodb');
 
-const url = 'mongodb://localhost:27017';
+const url = process.env.MONGODB_URL || 'mongodb://localhost:27017';
 const dbName = 'telegramBot';
 const collectionName = 'allowedLinks';
 
@@ -21,7 +21,7 @@ async function connectDB() {
 
 async function addLink(link) {
   if (!collection) {
-    await connectDB(); // Intenta conectar a la base de datos si no está conectado
+    await connectDB();
   }
   try {
     const result = await collection.insertOne({ url: link });
@@ -34,7 +34,7 @@ async function addLink(link) {
 
 async function isLinkRegistered(link) {
   if (!collection) {
-    await connectDB(); // Intenta conectar a la base de datos si no está conectado
+    await connectDB();
   }
   try {
     const result = await collection.findOne({ url: link });
@@ -47,9 +47,8 @@ async function isLinkRegistered(link) {
 
 async function addUserWarning(userId) {
   if (!collection) {
-    await connectDB(); // Intenta conectar a la base de datos si no está conectado
+    await connectDB();
   }
-
   try {
     const user = await collection.findOne({ userId });
     if (user) {
@@ -69,7 +68,7 @@ async function addUserWarning(userId) {
 
 async function removeLink(link) {
   if (!collection) {
-    await connectDB(); // Intenta conectar a la base de datos si no está conectado
+    await connectDB();
   }
   try {
     const result = await collection.deleteOne({ url: link });
@@ -77,7 +76,7 @@ async function removeLink(link) {
       console.log(`Link removed from database: ${link}`);
       return true;
     } else {
-      console.log(`The link ${link} was not found in the database..`);
+      console.log(`The link ${link} was not found in the database.`);
       return false;
     }
   } catch (error) {
