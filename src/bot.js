@@ -8,8 +8,8 @@ const bot = new Telegraf(botToken);
 // Mensaje de ayuda
 const helpMessage = `
 Commands:
-/addLink <link> - Adds a link to the list of allowed links. Only administrators can use this command.
-/removeLink <link> - Removes a link from the list of allowed links. Only administrators can use this command.
+/addLink - Adds a link to the list of allowed links. Only administrators can use this command.
+/removeLink - Removes a link from the list of allowed links. Only administrators can use this command.
 /help - Show a list of commands.
 `;
 
